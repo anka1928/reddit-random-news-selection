@@ -1,26 +1,72 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { PureComponent } from 'react'
+import Styles from './App.module.css';
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { getNews } from './redux/actions'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+class App extends PureComponent {
+  constructor(props) {
+    super(props)
+    
+    this.state = {
+      currentOption: ''
+    }
+  }
+
+  handleClick = optionName => () => {
+    this.props.getNews(optionName)
+    this.setState({ currentOption: optionName })
+  }
+
+  getOptions() {
+    return [{optionName: "frontend", id: 1}, {optionName: "reactjs", id: 2}, {optionName: "vuejs", id: 3},  {optionName: "angular", id: 4}]
+  }
+
+  isOptionActive(optionName) {
+    return this.state.currentOption === optionName
+  }
+
+  render() {
+    const options = this.getOptions()
+    const { randomNews } = this.props;
+
+    return (
+      <div className={Styles.app}>
+        Please, select subreddit
+        <ul className={Styles.container}>
+          {options && options.map(({optionName, id}) => {
+            return (
+              <div className={Styles.buttonContainer} key={id}>
+                <button className={this.isOptionActive(optionName) ? Styles.optionActive : Styles.option} onClick={this.handleClick(optionName)}>{optionName}</button>
+              </div>
+            )
+          }
+          )}
+        </ul>
+        <div className={Styles.linkContainer}>
+          {this.props.isFetching && (<span>loading...</span>)}
+          {randomNews && (<a className={Styles.link} href={randomNews.data.url}>{this.props.currentOption}:&nbsp;{randomNews.data.title}</a>)}
+        </div>
+      </div>
+    )
+  };
 }
 
-export default App;
+const mapStateToProps = state => ({
+  news: state.all,
+  randomNews: state.randomNews,
+  isFetching: state.isFetching,
+  currentOption: state.currentOption
+})
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({
+    getNews,
+  }, dispatch)
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App)
+
