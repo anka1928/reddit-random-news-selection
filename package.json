@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "https://github.com/anka1928/reddit-random-news-selection",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-redux": "^6.0.1",
